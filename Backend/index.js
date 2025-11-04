@@ -6,6 +6,7 @@ import authRouter from './routes/auth.routes.js';
 import session from 'express-session';
 import requestIp from 'request-ip';
 import userRouter from './routes/user.routes.js';
+import chatRouter from './routes/chat.routes.js';
 configDotenv();
 
 const app = express();
@@ -29,6 +30,7 @@ app.use(requestIp.mw());
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
+app.use("/api/chat", chatRouter);
 
 app.listen(PORT, () => {
     console.log("Server is running at port:", PORT);
