@@ -64,23 +64,23 @@ export const sendFriendRequest = async (req, res) => {
         const recipientId = req.params.id;
 
         // prevents sending req to yourself
-        if (myId === recipientId) res.status(400).json({ success: false, message: "You can't send friend request to yourself" });
+        if (myId === recipientId) return res.status(400).json({ success: false, message: "You can't send friend request to yourself" });
 
         const recipient = await User.findById(recipientId);
-        if (!recipient) res.status(400).json({ message: "Recipient not found" });
+        if (!recipient) return res.status(400).json({ message: "Recipient not found" });
 
         // prevent sending friend req to already a friend
         if (recipient.friends.includes(myId)) return res.status(400).json({ success: false, message: "You are already friends" });
 
         // check if req already exists
-        const isReqExists = await FriendRequest.findOne({
+        const existingRequest = await FriendRequest.findOne({
             $or: [
                 { sender: myId, recipient: recipientId },
                 { sender: recipientId, recipient: myId }
             ],
         });
 
-        if (isReqExists)
+        if (existingRequest)
             return res
                 .status(400)
                 .json({ success: false, message: "A friend request already exists between you and this user" });
@@ -110,10 +110,10 @@ export const accpetFriendRequest = async (req, res) => {
     try {
         if (!req.user) return res.status(400).json({ success: false, message: "You are not authenticated" });
 
-        const requestId = req.user.id;
+        const requestId = req.params.id;
 
         const friendRequest = await FriendRequest.findById(requestId);
-        if (friendRequest) res.status(400).json({ success: false, message: "No friend request found" });
+        if (!friendRequest) return res.status(400).json({ success: false, message: "No friend request found" });
 
         // Check if current user is the recipient
         if (friendRequest.recipient.toString() !== req.user.id) return res
@@ -157,16 +157,16 @@ export const getAllFriendRequests = async (req, res) => {
 
         const incommingRequest = await FriendRequest.find({
             recipient: req.user.id,
-            status: pending,
+            status: "pending",
         }).populate("sender", "fullName profilePic nativeLanguage");
 
         const acceptedRequests = await FriendRequest.find({
             recipient: req.user.id,
-            status: "pending",
+            status: "accepted",
         }).populate("recipient", "fullName profilePic");
 
         return res.status(200).json({
-            success: false,
+            success: true,
             incommingRequest,
             acceptedRequests,
         });
@@ -192,7 +192,7 @@ export const getAllOutgoingFriendRequests = async (req, res) => {
         }).populate("recipient", "fullName profilePic nativeLanguage");
 
         return res.status(200).json({
-            success: false,
+            success: true,
             outgoingRequests,
         });
 
