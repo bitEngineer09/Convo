@@ -16,4 +16,9 @@ authRouter.post("/logout", isAuth, logoutController);
 authRouter.get("/getUserData", isAuth, getUserData);
 authRouter.post("/onboarding", isAuth, onboardingController);
 
+// check if user is logged in 
+authRouter.get("/me", isAuth, (req, res) => {
+    res.status(200).json({success: true, user: req.user});
+});
+
 export default authRouter;
