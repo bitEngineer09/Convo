@@ -11,13 +11,15 @@ const getMe = async () => {
 
 const ProtectedRoute = ({ children }) => {
 
-    const { data, isLoading } = useQuery({
-        queryKey: ["me"],
+    const { data, isLoading, isError } = useQuery({
+        queryKey: ["authUser"],
         queryFn: getMe,
         retry: false,
     });
 
-    if (isLoading) return <Loader />
+    if (isLoading) return <Loader />;
+    if (isError) return <Navigate to="/auth" replace />;
+
     const user = data?.user;
     return user ? children : <Navigate to="/auth" replace />;
 
