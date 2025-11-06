@@ -2,17 +2,53 @@ import React, { useState } from 'react'
 import { LuMessageCircleHeart } from "react-icons/lu"
 import { MdEmail } from "react-icons/md";
 import { FaLock } from "react-icons/fa";
+import { FaEyeSlash } from "react-icons/fa";
+import { FaEye } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import chatLogo from '../assets/chatlogo.png'
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { ring } from 'ldrs'
+import { auth } from '../lib/api';
+ring.register();
 
 
 const Auth = () => {
 
     const [newUser, setNewUser] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [signupData, setSignupData] = useState({
+        fullName: "",
+        email: "",
+        password: "",
+    });
+    const [loginData, setLoginData] = useState({
+        email: "",
+        password: "",
+    });
+    const navigate = useNavigate();
 
-    const submitHandler = (e) => {
+    // form submit handler
+    const formSubmitHandler = (e) => {
         e.preventDefault();
-    }
+        mutate({ newUser, signupData, loginData });
+    };
+
+    // Signup Query
+    const queryClient = useQueryClient();
+    const { mutate, isPending, error } = useMutation({
+        mutationFn: ({ newUser, signupData, loginData }) => auth(newUser, signupData, loginData),
+
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ["authUser"] });
+            variables.newUser ? navigate("/onboarding") : navigate("/");
+        },
+
+        onError: (err) => {
+            console.error("Auth error:", err?.response?.data || err.message);
+        },
+    });
+
 
     return (
         <div
@@ -51,7 +87,7 @@ const Auth = () => {
                         </p>
                     </div>
 
-                    <form action="" className='text-sm sm:text-base' onSubmit={submitHandler}>
+                    <form action="" className='text-sm sm:text-base' onSubmit={formSubmitHandler}>
                         {
                             newUser && (
                                 <div className='mb-3 sm:mb-4'>
@@ -62,7 +98,9 @@ const Auth = () => {
                                     <input
                                         type="text"
                                         id="name"
-                                        name="name"
+                                        name="fullName"
+                                        value={signupData.fullName}
+                                        onChange={(e) => setSignupData({ ...signupData, fullName: e.target.value })}
                                         placeholder="Your full name"
                                         className="
                                             bg-zinc-800
@@ -90,6 +128,18 @@ const Auth = () => {
                                 type="email"
                                 id="email"
                                 name="email"
+                                value={newUser ? signupData.email : loginData.email}
+                                onChange={(e) => {
+                                    if (newUser) {
+                                        setSignupData({
+                                            ...signupData, email: e.target.value
+                                        });
+                                    } else {
+                                        setLoginData({
+                                            ...loginData, email: e.target.value
+                                        })
+                                    }
+                                }}
                                 placeholder="your.email@example.com"
                                 className="
                                     bg-zinc-800
@@ -106,15 +156,27 @@ const Auth = () => {
                             />
                         </div>
 
-                        <div className='mb-4 sm:mb-5 md:mb-6'>
+                        <div className='mb-4 sm:mb-5 md:mb-6 relative'>
                             <div className='flex items-center gap-1.5 sm:gap-2 mb-2'>
                                 <FaLock className='text-sm sm:text-base' />
                                 <label htmlFor="password" className='text-xs sm:text-sm md:text-base'>Password</label>
                             </div>
                             <input
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 id="password"
                                 name="password"
+                                value={newUser ? signupData.password : loginData.password}
+                                onChange={(e) => {
+                                    if (newUser) {
+                                        setSignupData({
+                                            ...signupData, password: e.target.value
+                                        });
+                                    } else {
+                                        setLoginData({
+                                            ...loginData, password: e.target.value
+                                        });
+                                    }
+                                }}
                                 placeholder="Enter your password"
                                 className="
                                     bg-zinc-800
@@ -129,10 +191,27 @@ const Auth = () => {
                                     placeholder:text-zinc-500
                                     "
                             />
+
+                            {/* Show password icon */}
+                            <div
+                                onClick={() => setShowPassword(!showPassword)}
+                                className='absolute right-4 top-[59%] md:top-13'>
+                                {showPassword ? <FaEye /> : <FaEyeSlash />}
+                            </div>
                         </div>
+
+                        {
+                            error && (
+                                <div role="alert" className="alert alert-error alert-soft mb-6">
+                                    <span>{error.response.data.message}</span>
+                                </div>
+                            )
+                        }
 
                         {/* Sign in button */}
                         <button
+                            type="submit"
+                            disabled={isPending}
                             className='
                                 cursor-pointer
                                 bg-blue-600 hover:bg-blue-700
@@ -145,9 +224,18 @@ const Auth = () => {
                                 hover:scale-[1.02]
                                 active:scale-95
                             '>
-                            {
-                                newUser ? "Create Account" : "Sign in"
+                            {isPending ? (
+                                <l-ring
+                                    size="25"
+                                    stroke="5"
+                                    bg-opacity="0"
+                                    speed="2"
+                                    color="white"
+                                />
+                            ) :
+                                (newUser ? "Create Account" : "Sign in")
                             }
+
                         </button>
 
 
@@ -195,6 +283,7 @@ const Auth = () => {
                 {/* Right Content */}
                 <div
                     className='
+                        hidden lg:block
                         w-full lg:w-1/2
                         bg-blue-700 
                         p-4 sm:p-5 md:p-6 lg:p-8
