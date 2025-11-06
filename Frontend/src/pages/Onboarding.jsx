@@ -4,12 +4,17 @@ import { CgProfile } from "react-icons/cg";
 import { MdOutlineEditNote } from "react-icons/md";
 import { IoLanguageOutline } from "react-icons/io5";
 import { IoLocationOutline } from "react-icons/io5";
+import { useAuthUser } from '../hooks/useAuthUser';
 
 const Onboarding = () => {
 
+    // Form submit handler
     const submitHandler = (e) => {
         e.preventDefault();
-    }
+    };
+
+    const { isLoading, authUser } = useAuthUser();
+    console.log(authUser)
 
     return (
         <div
@@ -64,11 +69,11 @@ const Onboarding = () => {
                 </section>
 
                 {/* Profile Complete Section */}
-                <form 
+                <form
                     action=""
                     className='mt-5 sm:mt-6 md:mt-8 space-y-3 sm:space-y-4'
                     onSubmit={submitHandler}
-                    >
+                >
 
                     {/* Full Name */}
                     <div>
@@ -116,23 +121,24 @@ const Onboarding = () => {
                             <IoLanguageOutline className='text-blue-500 text-sm sm:text-base' />
                             <label htmlFor="lang" className='text-xs sm:text-sm md:text-base font-medium'>Native Language</label>
                         </div>
-                        <select
-                            id="lang"
-                            className='
+                        <fieldset className="fieldset">
+                            <select
+                                defaultValue="Pick a language"
+                                className="
+                                select
                                 w-full
                                 bg-zinc-800 border-2 border-zinc-700 
-                                px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 rounded-xl
+                                rounded-xl
                                 text-xs sm:text-sm md:text-base
                                 outline-none focus:border-blue-500
                                 transition-all cursor-pointer
-                            '>
-                            <option value="english">English</option>
-                            <option value="hindi">Hindi</option>
-                            <option value="punjabi">Punjabi</option>
-                            <option value="spanish">Spanish</option>
-                            <option value="french">French</option>
-                            <option value="german">German</option>
-                        </select>
+                                ">
+                                <option disabled={true}>Pick a language</option>
+                                <option>English</option>
+                                <option>Hindi</option>
+                                <option>French</option>
+                            </select>
+                        </fieldset>
                     </div>
 
                     {/* Location */}

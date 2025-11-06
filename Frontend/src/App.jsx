@@ -6,66 +6,34 @@ import Notifications from './pages/Notifications';
 import CallPage from './pages/CallPage';
 import ChatPage from './pages/ChatPage';
 import Home from './pages/Home';
-import ProtectedRoute from './components/ProtectedRoute';
+import { useAuthUser } from './hooks/useAuthUser';
+import PageLoader from './components/PageLoader';
+import { useUserData } from './hooks/useUserData';
 
 const App = () => {
-  return (
-    <Routes>
 
-      {/* Public Routes */}
-      <Route path="/auth" element={<Auth />} />
+    const { isLoading: authLoading, authUser } = useAuthUser();
+    const { isLoading: userLoading, userData } = useUserData();
 
-      {/* Protected Routes */}
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        }
-      />
+    const isAuthenticated = Boolean(authUser);
+    if (authLoading || userLoading) return <PageLoader />;
 
-      <Route
-        path="/onboarding"
-        element={
-          <ProtectedRoute>
-            <Onboarding />
-          </ProtectedRoute>
-        }
-      />
+    return (
+        <Routes>
+            {/* Public Route */}
+            <Route path="/auth" element={<Auth />} />
 
-      <Route
-        path="/notifications"
-        element={
-          <ProtectedRoute>
-            <Notifications />
-          </ProtectedRoute>
-        }
-      />
+            {/* Protected Routes — redirect to /auth if not logged in */}
+            <Route path="/" element={isAuthenticated && userData?.isOnboarded ? <Home /> : <Navigate to={!isAuthenticated ? "/auth" : "/onboarding"} replace />} />
+            <Route path="/onboarding" element={isAuthenticated ? <Onboarding /> : <Navigate to="/auth" replace />} />
+            <Route path="/notifications" element={isAuthenticated ? <Notifications /> : <Navigate to="/auth" replace />} />
+            <Route path="/call" element={isAuthenticated ? <CallPage /> : <Navigate to="/auth" replace />} />
+            <Route path="/chat" element={isAuthenticated ? <ChatPage /> : <Navigate to="/auth" replace />} />
 
-      <Route
-        path="/call"
-        element={
-          <ProtectedRoute>
-            <CallPage />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/chat"
-        element={
-          <ProtectedRoute>
-            <ChatPage />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Default fallback */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-
-    </Routes>
-  );
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+    );
 };
 
 export default App;

@@ -105,11 +105,6 @@ export const loginController = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: "User logged in successfully",
-            // user: {
-            //     id: user._id,
-            //     fullName: user.fullName,
-            //     email: user.email,
-            // }
         })
 
     } catch (error) {
@@ -179,6 +174,9 @@ export const getUserData = async (req, res) => {
                 id: user._id,
                 fullName: user.fullName,
                 email: user.email,
+                isOnboarded: user.isOnboarded,
+                profilePic: user.profilePic,
+                friends: user.friends,
                 createdAt: user.createdAt,
                 updatedAt: user.updatedAt,
             }
