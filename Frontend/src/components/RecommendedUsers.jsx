@@ -1,9 +1,10 @@
 import React from 'react'
 import { LANGUAGE_TO_FLAG } from '../constants/constants';
 import { Link } from 'react-router-dom';
-import { FaLocationArrow, FaMap, FaMapPin, FaUserFriends } from 'react-icons/fa';
+import { FaMapPin, FaUserFriends } from 'react-icons/fa';
+import { MdOutlineCheckCircleOutline } from "react-icons/md";
 
-const RecommendedUsers = ({ user }) => {
+const RecommendedUsers = ({ user, onSendRequest, isRequestSent }) => {
   return (
     <div
       className='
@@ -31,7 +32,17 @@ const RecommendedUsers = ({ user }) => {
       <p>{user?.bio}</p>
 
       {/* Friend req send btn */}
-      <button className='btn btn-primary btn-outline flex gap-3 items-center'><FaUserFriends /> Send Friend Request</button>
+      {
+        isRequestSent ?
+          <button disabled className='btn btn-disable btn-outline flex gap-3 items-center'>
+            <MdOutlineCheckCircleOutline /> Friend Request sent
+          </button> :
+          <button
+            onClick={onSendRequest}
+            className='btn btn-primary btn-outline flex gap-3 items-center'>
+            <FaUserFriends /> Send Friend Request
+          </button>
+      }
     </div>
   )
 }
@@ -46,9 +57,9 @@ function getLanguageFlag(language) {
 
   if (countryCode) {
     return (
-      <img 
+      <img
         src={`https://flagcdn.com/24x18/${countryCode}.png`}
-        alt={`${langLower} flag`} 
+        alt={`${langLower} flag`}
         className='size-3'
       />
     )
