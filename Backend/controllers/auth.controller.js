@@ -177,6 +177,8 @@ export const getUserData = async (req, res) => {
                 isOnboarded: user.isOnboarded,
                 profilePic: user.profilePic,
                 friends: user.friends,
+                bio: user.bio,
+                nativeLanguage: user.nativeLanguage,
                 createdAt: user.createdAt,
                 updatedAt: user.updatedAt,
             }
@@ -194,69 +196,69 @@ export const getUserData = async (req, res) => {
 
 // Onboarding controller
 export const onboardingController = async (req, res) => {
-  try {
-    if (!req.user) return res.status(400).json({ 
-        success: false, 
-        message: "You are not authenticated" 
-      });
-
-    const userId = req.user.id;
-    const { fullName, bio, nativeLanguage, location } = req.body;
-
-
-    if (!fullName || !bio || !nativeLanguage || !location) return res.status(400).json({ 
-        success: false, 
-        message: "All fields are not provided" 
-      });
-
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { 
-        fullName,
-        bio,
-        nativeLanguage, 
-        location,
-        isOnboarded: true,
-      },
-      { new: true }
-    );
-
-    if (!updatedUser) return res.status(400).json({ 
-        success: false, 
-        message: "Error occurred in updating the user onboarding details" 
-      });
-
     try {
-      // Update Stream chat user with the new information
-      await upsertStreamUser({
-        id: updatedUser._id.toString(),
-        name: updatedUser.fullName,
-        image: updatedUser.profilePic || "",
-      });
-      console.log(`Stream user updated after onboarding for ${updatedUser._id}: ${updatedUser.fullName}`);
-      
-    } catch (streamError) {
-      console.error("Error updating Stream user during onboarding:", streamError.message);
+        if (!req.user) return res.status(400).json({
+            success: false,
+            message: "You are not authenticated"
+        });
+
+        const userId = req.user.id;
+        const { fullName, bio, nativeLanguage, location } = req.body;
+
+
+        if (!fullName || !bio || !nativeLanguage || !location) return res.status(400).json({
+            success: false,
+            message: "All fields are not provided"
+        });
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            {
+                fullName,
+                bio,
+                nativeLanguage,
+                location,
+                isOnboarded: true,
+            },
+            { new: true }
+        );
+
+        if (!updatedUser) return res.status(400).json({
+            success: false,
+            message: "Error occurred in updating the user onboarding details"
+        });
+
+        try {
+            // Update Stream chat user with the new information
+            await upsertStreamUser({
+                id: updatedUser._id.toString(),
+                name: updatedUser.fullName,
+                image: updatedUser.profilePic || "",
+            });
+            console.log(`Stream user updated after onboarding for ${updatedUser._id}: ${updatedUser.fullName}`);
+
+        } catch (streamError) {
+            console.error("Error updating Stream user during onboarding:", streamError.message);
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Onboarding details updated successfully",
+            user: {
+                id: updatedUser._id,
+                fullName: updatedUser.fullName,
+                bio: updatedUser.bio,
+                nativeLanguage: updatedUser.nativeLanguage,
+                location: updatedUser.location,
+                isOnboarded: updatedUser.isOnboarded
+            }
+        });
+
+    } catch (error) {
+        console.error("Onboarding controller error:", error.message);
+        return res.status(500).json({
+            success: false,
+            message: `Onboarding controller error: ${error.message}`
+        });
     }
-
-    return res.status(200).json({ 
-      success: true, 
-      message: "Onboarding details updated successfully",
-      user: {
-        id: updatedUser._id,
-        fullName: updatedUser.fullName,
-        bio: updatedUser.bio,
-        nativeLanguage: updatedUser.nativeLanguage,
-        location: updatedUser.location,
-        isOnboarded: updatedUser.isOnboarded
-      }
-    });
-
-  } catch (error) {
-    console.error("Onboarding controller error:", error.message);
-    return res.status(500).json({ 
-      success: false, 
-      message: `Onboarding controller error: ${error.message}` 
-    });
-  }
 };

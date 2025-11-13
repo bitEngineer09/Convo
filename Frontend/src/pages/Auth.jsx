@@ -6,11 +6,9 @@ import { FaEyeSlash } from "react-icons/fa";
 import { FaEye } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import chatLogo from '../assets/chatlogo.png'
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { ring } from 'ldrs'
-import { auth } from '../lib/api';
-ring.register();
+import Loader from '../components/Loader';
+import { useSignUp } from '../hooks/useAuth';
 
 
 const Auth = () => {
@@ -27,27 +25,13 @@ const Auth = () => {
         password: "",
     });
     const navigate = useNavigate();
+    const {isPending, error, authMutaion} = useSignUp();
 
     // form submit handler
     const formSubmitHandler = (e) => {
         e.preventDefault();
-        mutate({ newUser, signupData, loginData });
+        authMutaion({ newUser, signupData, loginData, navigate });
     };
-
-    // Signup Query
-    const queryClient = useQueryClient();
-    const { mutate, isPending, error } = useMutation({
-        mutationFn: ({ newUser, signupData, loginData }) => auth(newUser, signupData, loginData),
-
-        onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ["authUser"] });
-            variables.newUser ? navigate("/onboarding") : navigate("/");
-        },
-
-        onError: (err) => {
-            console.error("Auth error:", err?.response?.data || err.message);
-        },
-    });
 
 
     return (
@@ -203,7 +187,7 @@ const Auth = () => {
                         {
                             error && (
                                 <div role="alert" className="alert alert-error alert-soft mb-6">
-                                    <span>{error.response.data.message}</span>
+                                    <span>{error?.response?.data?.message}</span>
                                 </div>
                             )
                         }
@@ -225,13 +209,7 @@ const Auth = () => {
                                 active:scale-95
                             '>
                             {isPending ? (
-                                <l-ring
-                                    size="25"
-                                    stroke="5"
-                                    bg-opacity="0"
-                                    speed="2"
-                                    color="white"
-                                />
+                                <Loader />
                             ) :
                                 (newUser ? "Create Account" : "Sign in")
                             }

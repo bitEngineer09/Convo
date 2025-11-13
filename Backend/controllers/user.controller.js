@@ -8,12 +8,16 @@ export const getRecommendedUsers = async (req, res) => {
         if (!req.user) return res.status(400).json({ success: false, message: "You are not authenticated" });
 
         const currentUserId = req.user.id;
-        const currentUser = req.user;
+        const currentUser = await User.findById(currentUserId);
+
+        if (!currentUser) return res.status(404).json({success: false, message: "User not found"});
+
+        const excludeIds = currentUser.friends || []
 
         const recommendedUsers = await User.find({
             $and: [
                 { _id: { $ne: currentUserId } },
-                { $id: { $nin: currentUser.friends } },
+                { _id: { $nin: excludeIds } },
                 { isOnboarded: true },
             ]
         });
@@ -25,7 +29,7 @@ export const getRecommendedUsers = async (req, res) => {
 
     } catch (error) {
         console.error("Error in getRecommendedUsers controller", error.message);
-        return res.status(400).json({
+        return res.status(500).json({
             success: false,
             message: "Internal Server Error",
         });

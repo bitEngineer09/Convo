@@ -32,17 +32,12 @@ export const isAuth = async (req, res, next) => {
 
                 const baseConfig = {
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === "production",
-                    sameSite: "strict",
+                    secure: process.env.NODE_ENV === "production" ? true : false,
+                    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
                 };
 
-                res.cookie("access_token", newAccessToken, {
-                    ...baseConfig
-                });
-
-                res.cookie("refresh_token", newRefreshToken, {
-                    ...baseConfig
-                });
+                res.cookie("access_token", newAccessToken, baseConfig);
+                res.cookie("refresh_token", newRefreshToken, baseConfig);
 
                 return next();
 

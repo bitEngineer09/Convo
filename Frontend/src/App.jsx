@@ -6,33 +6,58 @@ import Notifications from './pages/Notifications';
 import CallPage from './pages/CallPage';
 import ChatPage from './pages/ChatPage';
 import Home from './pages/Home';
+import Friends from './pages/Friends';
+import Layout from './components/Layout';
 import { useAuthUser } from './hooks/useAuthUser';
-import PageLoader from './components/PageLoader';
 import { useUserData } from './hooks/useUserData';
+import PageLoader from './components/PageLoader';
+import { Toaster } from 'react-hot-toast';
+import { useThemeSlot } from './store/useThemeSlot';
 
 const App = () => {
-
     const { isLoading: authLoading, authUser } = useAuthUser();
     const { isLoading: userLoading, userData } = useUserData();
+    const { theme } = useThemeSlot();
 
     const isAuthenticated = Boolean(authUser);
+    const isOnboarded = userData?.isOnboarded;
+
+    // console.log("Auth Status:", { isAuthenticated, isOnboarded, userData });
+
     if (authLoading || userLoading) return <PageLoader />;
 
     return (
-        <Routes>
-            {/* Public Route */}
-            <Route path="/auth" element={<Auth />} />
+        <div data-theme={theme} className='transition-colors duration-400'>
+            <Routes>
+                <Route path="/auth" element={!isAuthenticated ? <Auth /> : <Navigate to="/" replace />} />
+                
+                <Route 
+                    path="/onboarding" 
+                    element={
+                        isAuthenticated && !isOnboarded ? <Onboarding /> : <Navigate to="/" replace />
+                    } 
+                />
 
-            {/* Protected Routes — redirect to /auth if not logged in */}
-            <Route path="/" element={isAuthenticated && userData?.isOnboarded ? <Home /> : <Navigate to={!isAuthenticated ? "/auth" : "/onboarding"} replace />} />
-            <Route path="/onboarding" element={isAuthenticated ? <Onboarding /> : <Navigate to="/auth" replace />} />
-            <Route path="/notifications" element={isAuthenticated ? <Notifications /> : <Navigate to="/auth" replace />} />
-            <Route path="/call" element={isAuthenticated ? <CallPage /> : <Navigate to="/auth" replace />} />
-            <Route path="/chat" element={isAuthenticated ? <ChatPage /> : <Navigate to="/auth" replace />} />
+                {isAuthenticated && isOnboarded ? (
+                    <Route element={<Layout />}>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/chat/:id" element={<ChatPage />} />
+                        <Route path="/notifications" element={<Notifications />} />
+                        <Route path="/call" element={<CallPage />} />
+                        <Route path="/friends" element={<Friends />} />
+                    </Route>
+                ) : (
+                    <Route path="*" element={
+                        <Navigate to={
+                            !isAuthenticated ? "/auth" : 
+                            !isOnboarded ? "/onboarding" : "/"
+                        } replace />
+                    } />
+                )}
+            </Routes>
 
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            <Toaster />
+        </div>
     );
 };
 

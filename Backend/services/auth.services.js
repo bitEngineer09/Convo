@@ -1,9 +1,9 @@
 import Session from "../models/session.model.js";
 import User from "../models/user.model.js";
-import jwt from 'jsonwebtoken'; 
+import jwt from 'jsonwebtoken';
 
 // checking if user already exists ?
-export const  isUserExists = async (email) => {
+export const isUserExists = async (email) => {
     try {
         const user = await User.findOne({ email }).select("+password");
         return user;
@@ -32,11 +32,11 @@ export const createRefreshToken = (sessionId) => {
 }
 
 export const verifyToken = (token) => {
-  try {
-    return jwt.verify(token, process.env.JWT_SECRET);
-  } catch {
-    return null;
-  }
+    try {
+        return jwt.verify(token, process.env.JWT_SECRET);
+    } catch {
+        return null;
+    }
 };
 
 
@@ -61,17 +61,15 @@ export const authenticate = async (req, res, loggedInUser, registeredUser) => {
 
     const refreshToken = createRefreshToken(session._id);
 
-    res.cookie("access_token", accessToken, {
+    const baseConfig = {
         httpOnly: true,
-        secure: true,
-        sameSite: "None",
-    });
+        secure: process.env.NODE_ENV === "production" ? true : false,
+        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    }
 
-    res.cookie("refresh_token", refreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "None",
-    });
+    res.cookie("access_token", accessToken, baseConfig);
+
+    res.cookie("refresh_token", refreshToken, baseConfig);
 }
 //?--------------------------------------------------------------------
 

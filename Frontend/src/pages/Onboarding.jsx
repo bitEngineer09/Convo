@@ -1,20 +1,43 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { FaShuffle } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
 import { MdOutlineEditNote } from "react-icons/md";
 import { IoLanguageOutline } from "react-icons/io5";
 import { IoLocationOutline } from "react-icons/io5";
-import { useAuthUser } from '../hooks/useAuthUser';
+import { useUserData } from '../hooks/useUserData';
+import Loader from '../components/Loader';
+import PageLoader from '../components/PageLoader';
+import { LANGUAGES } from '../constants/constants';
+import { useOnboarding } from '../hooks/useOnboarding';
+import { useNavigate } from 'react-router-dom';
+
 
 const Onboarding = () => {
+
+    const { isLoading, userData } = useUserData();
+    console.log(userData);
+
+    const { isPending, onboardingMutation } = useOnboarding();
+    const navigate = useNavigate();
+
+    // Form Data
+    const [formState, setFormState] = useState({
+        profilePic: userData?.profilePic || "",
+        fullName: userData?.fullName || "",
+        bio: userData?.bio || "",
+        nativeLanguage: userData?.nativeLanguage || "",
+        location: userData?.location || ""
+    });
+
+    const [randomAvatar, setRandomAvatar] = useState(formState?.profilePic);
 
     // Form submit handler
     const submitHandler = (e) => {
         e.preventDefault();
+        onboardingMutation({ formState, navigate });
     };
 
-    const { isLoading, authUser } = useAuthUser();
-    console.log(authUser)
+    if (isLoading) return <PageLoader />
 
     return (
         <div
@@ -40,7 +63,8 @@ const Onboarding = () => {
                     </h1>
 
                     {/* Avatar Circle */}
-                    <div
+                    <img
+                        src={randomAvatar}
                         className='
                             rounded-full
                             w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32
@@ -48,20 +72,25 @@ const Onboarding = () => {
                             mt-2 sm:mt-3
                             flex items-center justify-center
                             border-4 border-blue-600 shadow-lg
-                        '>
-                        <CgProfile className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white opacity-50' />
-                    </div>
+                        '/>
+                    {/* <CgProfile className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white opacity-50' /> */}
 
                     <button
+                        onClick={() => {
+                            const idx = Math.floor(Math.random() * 100) + 1;
+                            const newAvatar = `https://avatar.iran.liara.run/public/${idx}`;
+                            setRandomAvatar(newAvatar);
+                            setFormState({ ...formState, profilePic: newAvatar });
+                        }}
                         className='
                             flex items-center
                             gap-1.5 sm:gap-2
                             bg-blue-600 hover:bg-blue-700
                             rounded-xl cursor-pointer
                             px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3
-                            text-white text-xs sm:text-sm md:text-base 
+                            text-white text-xs sm:text-sm md:text-base
                             transition-all duration-300 hover:scale-105
-                            font-semibold mt-2 sm:mt-3 
+                            font-semibold mt-2 sm:mt-3
                             shadow-md
                         '>
                         <FaShuffle className='text-xs sm:text-sm' /> Generate Random Avatar
@@ -85,6 +114,8 @@ const Onboarding = () => {
                             type="text"
                             id="name"
                             placeholder='Enter your full name'
+                            value={formState?.fullName}
+                            onChange={(e) => setFormState({ ...formState, fullName: e.target.value })}
                             className='
                                 w-full bg-zinc-800 
                                 border-2 border-zinc-700
@@ -105,6 +136,8 @@ const Onboarding = () => {
                             id="bio"
                             placeholder='Tell us about yourself...'
                             rows="3"
+                            value={formState?.bio}
+                            onChange={(e) => setFormState({ ...formState, bio: e.target.value })}
                             className='
                                 w-full
                                 py-2 sm:py-2.5 md:py-3 px-3 sm:px-4
@@ -123,6 +156,8 @@ const Onboarding = () => {
                         </div>
                         <fieldset className="fieldset">
                             <select
+                                value={formState?.nativeLanguage}
+                                onChange={(e) => setFormState({ ...formState, nativeLanguage: e.target.value })}
                                 defaultValue="Pick a language"
                                 className="
                                 select
@@ -134,9 +169,16 @@ const Onboarding = () => {
                                 transition-all cursor-pointer
                                 ">
                                 <option disabled={true}>Pick a language</option>
-                                <option>English</option>
-                                <option>Hindi</option>
-                                <option>French</option>
+                                {
+                                    LANGUAGES.map((lang) => {
+                                        return <option
+                                            key={`native-${lang}`}
+                                            value={lang.toLowerCase()}
+                                        >
+                                            {lang}
+                                        </option>
+                                    })
+                                }
                             </select>
                         </fieldset>
                     </div>
@@ -149,6 +191,8 @@ const Onboarding = () => {
                         </div>
                         <input
                             id="location"
+                            value={formState?.location}
+                            onChange={(e) => setFormState({ ...formState, location: e.target.value })}
                             type="text"
                             placeholder='City, Country'
                             className='
@@ -174,11 +218,16 @@ const Onboarding = () => {
                             active:scale-95 
                             mt-4 sm:mt-5 md:mt-6 shadow-lg
                         '>
-                        Complete Profile ✓
+                        {
+                            isPending ?
+                                <Loader />
+                                : "Complete Profile ✓"
+                        }
+
                     </button>
                 </form>
             </div>
-        </div>
+        </div >
     )
 }
 
