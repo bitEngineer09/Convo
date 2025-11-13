@@ -42,7 +42,13 @@ const Sidebar = () => {
                             `}
                         title={link.link}
                     >
-                        <p className="text-xl sm:text-2xl lg:text-base text-base-content">{link.icon}</p>
+                        <p className={({ isActive }) =>
+                            `
+                            text-xl sm:text-2xl lg:text-base
+                            text-base-content
+                            ${isActive ? "text-primary" : ""}
+                        `
+                        }>{link.icon}</p>
                         <p className="hidden lg:block ">{link.link}</p>
                     </NavLink>
                 ))}
@@ -50,7 +56,7 @@ const Sidebar = () => {
 
             {/* Bottom Profile Section */}
             <div className="flex items-center gap-2 p-2 lg:p-3 border border-t border-base-300 mt-auto rounded-xl">
-                <img src={userData?.profilePic} className="size-10 rounded-full bg-zinc-700"/>
+                <img src={userData?.profilePic} className="size-10 rounded-full bg-zinc-700" />
                 <div className="hidden lg:block">
                     <p className="text-sm text-base-content font-semibold">{userData?.fullName}</p>
                     <div className='flex items-center gap-1'>

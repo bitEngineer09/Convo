@@ -154,35 +154,50 @@ export const accpetFriendRequest = async (req, res) => {
 
 // get all requests
 export const getAllFriendRequests = async (req, res) => {
-    try {
-        if (!req.user) return res.status(400).json({
-            success: false, message: "You are not authenticated",
-        });
+  try {
+    if (!req.user)
+      return res.status(400).json({
+        success: false,
+        message: "You are not authenticated",
+      });
 
-        const incommingRequest = await FriendRequest.find({
-            recipient: req.user.id,
-            status: "pending",
-        }).populate("sender", "fullName profilePic nativeLanguage");
+    const userId = req.user.id;
 
-        const acceptedRequests = await FriendRequest.find({
-            recipient: req.user.id,
-            status: "accepted",
-        }).populate("recipient", "fullName profilePic");
+    // pending requests you received
+    const incommingRequests = await FriendRequest.find({
+      recipient: userId,
+      status: "pending",
+    }).populate("sender", "fullName profilePic nativeLanguage");
 
-        return res.status(200).json({
-            success: true,
-            incommingRequest,
-            acceptedRequests,
-        });
+    // accepted requests where you were the recipient
+    const acceptedAsRecipient = await FriendRequest.find({
+      recipient: userId,
+      status: "accepted",
+    }).populate("sender", "fullName profilePic");
 
-    } catch (error) {
-        console.error("Error in get all friend request controller", error.message);
-        return res.status(400).json({
-            success: false,
-            message: "Internal Server Error",
-        })
-    }
-}
+    // accepted requests where you were the sender
+    const acceptedAsSender = await FriendRequest.find({
+      sender: userId,
+      status: "accepted",
+    }).populate("recipient", "fullName profilePic");
+
+    // merge both accepted arrays
+    const acceptedRequests = [...acceptedAsRecipient, ...acceptedAsSender];
+
+    return res.status(200).json({
+      success: true,
+      incommingRequests,
+      acceptedRequests,
+    });
+  } catch (error) {
+    console.error("Error in getAllFriendRequests controller", error.message);
+    return res.status(400).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
 
 
 // get all outgoing friend requests

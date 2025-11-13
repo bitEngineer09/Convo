@@ -73,12 +73,11 @@ export const getFriends = async () => {
   }
 }
 
-
 // get recommended users
 export const getRecommendedUsers = async () => {
   try {
     const res = await axiosInstance.get("/user/");
-    console.log("getRecommendedUsers data", res.data.recommendedUsers);
+    // console.log("getRecommendedUsers data", res.data.recommendedUsers);
     return res.data.recommendedUsers;
   } catch (error) {
     console.log("Error in getRecommendedUsers: ", error);
@@ -90,7 +89,7 @@ export const getRecommendedUsers = async () => {
 export const getAllOutgoingFriendRequests = async () => {
   try {
     const res = await axiosInstance.get("/user/outgoing-requests");
-    console.log("getAllOutgoingFriendRequests data: ", res);
+    // console.log("getAllOutgoingFriendRequests data: ", res);
     return res.data.outgoingRequests;
   } catch (error) {
     console.log("Error in getAllOutgoingFriendRequests: ", error);
@@ -108,4 +107,18 @@ export const sendFriendRequest = async (userId) => {
     console.log("Error in sendFriendRequests", error);
     throw error;
   }
+}
+
+// get all friend requests
+export const getAllFriendRequests = async () => {
+  const res = await axiosInstance.get("/user/friend-requests");
+  // console.log("getAllFriendRequests data", res.data);
+  return res.data;
+}
+
+// accpet friend requests
+export const accpetFriendRequest = async (id) => {
+  const res = await axiosInstance.put(`/user/friend-request/${id}/accept`);
+  console.log(res.data);
+  return res.data;
 }

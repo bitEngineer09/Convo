@@ -1,4 +1,3 @@
-// src/pages/Home.jsx (updated)
 import React, { useState } from 'react'
 import {
   getAllOutgoingFriendRequests,
@@ -40,7 +39,7 @@ const Home = () => {
       // optimistic: mark as sent
       setSentRequests(prev => new Set(prev).add(userId));
     },
-    onError: (err, userId, context) => {
+    onError: (err, userId) => {
       // revert optimistic
       setSentRequests(prev => {
         const copy = new Set(prev);
@@ -85,11 +84,11 @@ const Home = () => {
           </Link>
         </div>
 
-        { loadingFriends ? <Loader /> :
+        {loadingFriends ? <Loader /> :
           friends.length == 0 ? <NoFriends /> :
-          <div className='grid grid-cols-4'>
-            { friends?.map((friend) => <FriendsCard key={friend?._id} friend={friend} />) }
-          </div>
+            <div className='grid grid-cols-4'>
+              {friends?.map((friend) => <FriendsCard key={friend?._id} friend={friend} />)}
+            </div>
         }
       </section>
 
@@ -98,10 +97,10 @@ const Home = () => {
         <div>
           <p className='text-3xl font-medium mb-4'>Meet New Learners</p>
         </div>
-        { loadingRecommendedUsers ? <Loader /> :
+        {loadingRecommendedUsers ? <Loader /> :
           recommendedUsers?.length == 0 ? <NoRecommendation /> :
-          <div className='grid grid-cols-4 gap-4'>
-            { recommendedUsers.map((user) =>
+            <div className='grid grid-cols-4 gap-4'>
+              {recommendedUsers.map((user) =>
                 <RecommendedUsers
                   key={user?._id}
                   user={user}
@@ -109,8 +108,8 @@ const Home = () => {
                   isRequestSent={hasOutgoingRequest(user._id)}
                 />
               )
-            }
-          </div>
+              }
+            </div>
         }
       </section>
     </div>
