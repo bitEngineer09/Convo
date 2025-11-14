@@ -15,7 +15,7 @@ const PORT = process.env.PORT;
 
 app.use(express.urlencoded({extended: true}));
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: "https://convo-frontend-shfw.onrender.com",
     credentials: true,
 }));
 app.use(express.json());
