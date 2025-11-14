@@ -9,6 +9,7 @@ import { useAcceptRequests } from '../hooks/useAcceptRequests';
 import NoFriendRequests from '../components/NoFriendRequests';
 import Loader from '../components/Loader';
 import NoNewNotifications from '../components/NoNewNotifications';
+import { Link } from 'react-router-dom';
 
 const Notifications = () => {
   const { data: friendRequests, isLoading: loadingRequests } = useQuery({
@@ -62,10 +63,10 @@ const Notifications = () => {
                         mt-4 p-3 sm:p-4
                       '>
                       <div className='flex items-center gap-3 sm:gap-5 w-full sm:w-auto'>
-                        <img 
-                          src={requestedUser?.sender?.profilePic} 
-                          alt="" 
-                          className='size-14 sm:size-16 md:size-18 rounded-full flex-shrink-0' 
+                        <img
+                          src={requestedUser?.sender?.profilePic}
+                          alt=""
+                          className='size-14 sm:size-16 md:size-18 rounded-full shrink-0'
                         />
                         <div className='flex flex-col gap-1 sm:gap-2 min-w-0'>
                           <span className='text-sm sm:text-base font-medium truncate'>
@@ -134,10 +135,10 @@ const Notifications = () => {
                       mt-4 p-3 sm:p-4
                     '>
                     <div className='flex items-center gap-3 sm:gap-5 w-full sm:w-auto'>
-                      <img 
-                        src={user?.profilePic} 
-                        alt="" 
-                        className='size-14 sm:size-16 md:size-18 rounded-full flex-shrink-0' 
+                      <img
+                        src={user?.profilePic}
+                        alt=""
+                        className='size-14 sm:size-16 md:size-18 rounded-full shrink-0'
                       />
                       <div className='flex flex-col gap-1 sm:gap-2 min-w-0 flex-1'>
                         <span className='text-sm sm:text-base font-medium truncate'>
@@ -155,9 +156,16 @@ const Notifications = () => {
                       </div>
                     </div>
 
-                    <p className='flex gap-2 items-center badge badge-success text-xs sm:text-sm whitespace-nowrap'>
+                    <Link
+                      to={`/chat/${notification?.sender?._id}`}
+                      className='
+                        flex gap-2 items-center 
+                        badge badge-success 
+                        text-xs sm:text-sm
+                        whitespace-nowrap
+                      '>
                       <IoChatboxOutline /> New Friend
-                    </p>
+                    </Link>
                   </div>
                 </div>
               );

@@ -47,7 +47,7 @@ export const authenticate = async (req, res, loggedInUser, registeredUser) => {
     const name = fullName;
 
     const session = await createSession({
-        ip: req.ClientIp,
+        ip: req.clientIp,
         userAgent: req.headers["user-agent"],
         userId: id,
     })

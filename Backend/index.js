@@ -20,14 +20,16 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
+app.set("trust proxy", 1);
 app.use(session({
     secret:"mysecret",
     resave:  false,
     saveUninitialized: false,
     cookie: {
         httpOnly: true,
-        secure: false, //! deploy ke waqt true karna hai
-        sameSite: "lax", //! deploy ke waqt none karna hai
+        secure: true,
+        sameSite: "none",
+         maxAge: 1000 * 60 * 60 * 24 * 7,
     }
 }));
 app.use(requestIp.mw());

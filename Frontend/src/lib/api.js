@@ -98,9 +98,9 @@ export const getAllOutgoingFriendRequests = async () => {
 }
 
 // send friend requests
-export const sendFriendRequest = async (userId) => {
+export const sendFriendRequest = async (id) => {
   try {
-    const res = await axiosInstance.post(`/user/friend-request/${userId}`);
+    const res = await axiosInstance.post(`/user/friend-request/${id}`);
     // console.log(res.data);
     return res.data;
   } catch (error) {
@@ -111,14 +111,36 @@ export const sendFriendRequest = async (userId) => {
 
 // get all friend requests
 export const getAllFriendRequests = async () => {
-  const res = await axiosInstance.get("/user/friend-requests");
-  // console.log("getAllFriendRequests data", res.data);
-  return res.data;
+  try {
+    const res = await axiosInstance.get("/user/friend-requests");
+    // console.log("getAllFriendRequests data", res.data);
+    return res.data;
+  } catch (error) {
+    console.log("Error in getAllFriendRequests: ", error.message);
+    throw error;
+  }
 }
 
 // accpet friend requests
 export const accpetFriendRequest = async (id) => {
-  const res = await axiosInstance.put(`/user/friend-request/${id}/accept`);
-  console.log(res.data);
-  return res.data;
+  try {
+    const res = await axiosInstance.put(`/user/friend-request/${id}/accept`);
+    console.log(res.data);
+    return res.data;
+  } catch (error) {
+    console.log("Error in acceptFriendRequest: ", error.message);
+    throw error;
+  }
+}
+
+// get stream token
+export const getStreamToken = async () => {
+  try {
+    const res = await axiosInstance.get("/chat/token");
+    console.log(res.data);
+    return res.data;
+  } catch (error) {
+    console.log("Error in getStreamToken: ", error);
+    throw error;
+  }
 }

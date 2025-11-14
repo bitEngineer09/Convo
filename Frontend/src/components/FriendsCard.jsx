@@ -7,23 +7,44 @@ const FriendsCard = ({ friend }) => {
     return (
         <div
             className='
-                w-90 h-50
+                w-full
                 rounded-xl bg-base-200 hover:shadow-md
-                my-5 p-4
-                flex flex-col justify-around
+                my-3 sm:my-4 
+                p-3 sm:p-4
+                flex flex-col justify-between gap-3 sm:gap-4
                 transition-shadow
+                min-h-[170px] sm:min-h-[220px]
             '>
-            <div className='flex items-center gap-2'>
-                <img src={friend?.profilePic} alt="user avatar" className='h-15' />
-                <span className='text-xl font-medium'>{friend?.fullName}</span>
+            <div className='flex items-center gap-2 sm:gap-3'>
+                <img 
+                    src={friend?.profilePic} 
+                    alt="user avatar" 
+                    className='size-12 sm:size-14 md:size-16 rounded-full object-cover flex-shrink-0' 
+                />
+                <span className='text-base sm:text-lg md:text-xl font-medium truncate'>
+                    {friend?.fullName}
+                </span>
             </div>
 
             {/* Language section */}
-            <p className='p-1 badge badge-secondary text-xs font-medium w-40 text-center rounded-2xl'>
+            <p className='
+                p-1 sm:p-1.5
+                badge badge-secondary 
+                text-xs sm:text-sm font-medium 
+                w-full max-w-[160px] sm:max-w-[180px]
+                text-center rounded-2xl
+                flex items-center justify-center gap-1
+            '>
                 {getLanguageFlag(friend?.nativeLanguage)}
-                <span>{`Native: ${friend?.nativeLanguage}`}</span>
+                <span className='truncate'>{`Native: ${friend?.nativeLanguage}`}</span>
             </p>
-            <Link to={`/chat/${friend._id}`} className='btn btn-outline'>Message</Link>
+            
+            <Link 
+                to={`/chat/${friend._id}`} 
+                className='btn btn-outline btn-sm sm:btn-md w-full'
+            >
+                Message
+            </Link>
         </div>
     )
 }
@@ -41,7 +62,7 @@ function getLanguageFlag(language) {
             <img
                 src={`https://flagcdn.com/24x18/${countryCode}.png`}
                 alt={`${langLower} flag`}
-                className='size-3'
+                className='size-3 sm:size-3.5 flex-shrink-0'
             />
         )
     }

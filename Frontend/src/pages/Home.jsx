@@ -33,14 +33,16 @@ const Home = () => {
     queryFn: getAllOutgoingFriendRequests,
   });
 
+  console.log(recommendedUsers)
+  console.log(outgoingRequests)
+  console.log(sentRequests)
+
   const { mutate: sendRequestMutation, isLoading: sendingRequest } = useMutation({
     mutationFn: sendFriendRequest,
     onMutate: async (userId) => {
-      // optimistic: mark as sent
       setSentRequests(prev => new Set(prev).add(userId));
     },
     onError: (err, userId) => {
-      // revert optimistic
       setSentRequests(prev => {
         const copy = new Set(prev);
         copy.delete(userId);
@@ -56,11 +58,8 @@ const Home = () => {
     }
   });
 
-  // helper to check if a recommended user already has outgoing request
   const hasOutgoingRequest = (userId) => {
-    // check real outgoingRequests (from server) OR optimistic sentRequests
     const fromServer = outgoingRequests?.some(req => {
-      // req.recipient might be populated object or id depending on server
       const rid = req?.recipient?._id || req?.recipient;
       return rid?.toString() === userId?.toString();
     });
@@ -73,20 +72,23 @@ const Home = () => {
   }
 
   return (
-    <div className='flex flex-col '>
+    <div className='flex flex-col px-3 sm:px-4 md:px-6 py-4'>
       {/* Friends */}
-      <section className='min-h-60'>
-        <div className='flex justify-between items-center mb-3'>
-          <p className='text-3xl font-medium'>Your Friends</p>
-          <Link to="/notifications" className='btn btn-outline btn-md'>
-            <FaUserFriends />
-            <p>Friend Requests</p>
+      <section className='min-h-60 mb-6 sm:mb-8 md:mb-10'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 '>
+          <p className='text-2xl sm:text-3xl md:text-4xl font-medium'>Your Friends</p>
+          <Link 
+            to="/notifications" 
+            className='btn btn-outline btn-sm sm:btn-md w-full sm:w-auto'
+          >
+            <FaUserFriends className='text-base sm:text-lg' />
+            <span className='text-sm sm:text-base'>Friend Requests</span>
           </Link>
         </div>
 
         {loadingFriends ? <Loader /> :
           friends.length == 0 ? <NoFriends /> :
-            <div className='grid grid-cols-4'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4'>
               {friends?.map((friend) => <FriendsCard key={friend?._id} friend={friend} />)}
             </div>
         }
@@ -94,18 +96,18 @@ const Home = () => {
 
       {/* Recommended Users */}
       <section className='min-h-60'>
-        <div>
-          <p className='text-3xl font-medium mb-4'>Meet New Learners</p>
+        <div className='mb-4 sm:mb-5'>
+          <p className='text-2xl sm:text-3xl md:text-4xl font-medium'>Meet New Learners</p>
         </div>
         {loadingRecommendedUsers ? <Loader /> :
           recommendedUsers?.length == 0 ? <NoRecommendation /> :
-            <div className='grid grid-cols-4 gap-4'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4'>
               {recommendedUsers.map((user) =>
                 <RecommendedUsers
                   key={user?._id}
                   user={user}
-                  onSendRequest={() => handleSendRequest(user._id)}
-                  isRequestSent={hasOutgoingRequest(user._id)}
+                  onSendRequest={() => handleSendRequest(user?._id)}
+                  isRequestSent={hasOutgoingRequest(user?._id)}
                 />
               )
               }

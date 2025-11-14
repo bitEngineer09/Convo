@@ -13,6 +13,7 @@ import { useUserData } from './hooks/useUserData';
 import PageLoader from './components/PageLoader';
 import { Toaster } from 'react-hot-toast';
 import { useThemeSlot } from './store/useThemeSlot';
+import Profile from './pages/Profile';
 
 const App = () => {
     const { isLoading: authLoading, authUser } = useAuthUser();
@@ -41,9 +42,10 @@ const App = () => {
                 {isAuthenticated && isOnboarded ? (
                     <Route element={<Layout />}>
                         <Route path="/" element={<Home />} />
+                        <Route path="/profile" element={<Profile />} />
                         <Route path="/chat/:id" element={<ChatPage />} />
                         <Route path="/notifications" element={<Notifications />} />
-                        <Route path="/call" element={<CallPage />} />
+                        <Route path="/call/:id" element={<CallPage />} />
                         <Route path="/friends" element={<Friends />} />
                     </Route>
                 ) : (

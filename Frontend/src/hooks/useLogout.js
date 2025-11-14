@@ -5,15 +5,16 @@ export const useLogout = () => {
     const queryClient = useQueryClient();
 
     const { mutate: logoutMutation, isPending, error } = useMutation({
-        mutationFn: logout,
-        onSuccess: (_, variables) => {
-            variables.navigate("/");
+        mutationFn: ({ navigate }) => logout(),
+        onSuccess: (_, { navigate }) => {
             queryClient.invalidateQueries({ queryKey: ["authUser"] });
+            navigate("/login");
         },
 
         onError: (error) => {
-            console.log("logout mutation error: ", error.response.data.message);
+            console.log("logout mutation error: ", error?.response?.data?.message);
         }
     });
-    return { logoutMutation, isPending, error }
-}
+
+    return { logoutMutation, isPending, error };
+};
