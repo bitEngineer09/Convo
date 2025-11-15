@@ -262,3 +262,74 @@ export const onboardingController = async (req, res) => {
         });
     }
 };
+
+
+// Update Profile Controller
+export const updateProfileController = async (req, res) => {
+    try {
+        if (!req.user) return res.status(400).json({
+            success: false,
+            message: "You are not authenticated"
+        });
+
+        const userId = req.user.id;
+        const { fullName, bio, location } = req.body;
+
+        if (!fullName && !bio && !profilePic) {
+            return res.status(400).json({
+                success: false,
+                message: "No fields to update"
+            });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { fullName, bio, location },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        // Update Stream chat user if name changed
+        if (fullName) {
+            try {
+                await upsertStreamUser({
+                    id: updatedUser?._id.toString(),
+                    name: updatedUser?.fullName,
+                    image: updatedUser?.profilePic || "",
+                });
+                console.log(`Stream user updated for ${updatedUser?._id}: ${updatedUser?.fullName}`);
+            } catch (streamError) {
+                console.error("Error updating Stream user:", streamError.message);
+            }
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Profile updated successfully",
+            user: {
+                id: updatedUser._id,
+                fullName: updatedUser.fullName,
+                email: updatedUser.email,
+                bio: updatedUser.bio,
+                nativeLanguage: updatedUser.nativeLanguage,
+                location: updatedUser.location,
+                profilePic: updatedUser.profilePic,
+                createdAt: updatedUser.createdAt,
+                updatedAt: updatedUser.updatedAt
+            }
+        });
+
+    } catch (error) {
+        console.error("Update profile controller error:", error.message);
+        return res.status(500).json({
+            success: false,
+            message: `Update profile error: ${error.message}`
+        });
+    }
+};

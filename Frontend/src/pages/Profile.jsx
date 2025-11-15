@@ -1,25 +1,49 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useUserData } from '../hooks/useUserData'
-import { FaCalendarAlt, FaMapMarkerAlt, FaUser } from 'react-icons/fa'
+import { FaCalendarAlt, FaMapMarkerAlt, FaGlobe } from 'react-icons/fa'
 import { MdEmail } from 'react-icons/md'
+import EditProfileModal from '../components/EditProfileModal'
+import { LANGUAGE_TO_FLAG } from '../constants/constants'
 
 const Profile = () => {
-
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const { userData } = useUserData();
-    const { fullName, profilePic, bio, location, createdAt, email } = userData;
+    const { fullName, profilePic, bio, location, createdAt, email, nativeLanguage } = userData;
+
     const date = new Date(createdAt);
-    const joinedDate = date.toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
+    const joinedDate = date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
     });
+
+    const handleCloseModal = () => {
+        setIsEditModalOpen(false);
+    };
+
+    const getLanguageFlag = (language) => {
+        if (!language) return null;
+        const langLower = language.toLowerCase();
+        const countryCode = LANGUAGE_TO_FLAG[langLower];
+        
+        if (countryCode) {
+            return (
+                <img
+                    src={`https://flagcdn.com/24x18/${countryCode}.png`}
+                    alt={`${langLower} flag`}
+                    className='size-5'
+                />
+            );
+        }
+        return null;
+    };
 
     return (
         <div className='px-3 sm:px-4 md:px-6 py-4'>
             <h1 className='text-2xl sm:text-3xl md:text-4xl font-medium mb-6 sm:mb-8'>
                 Profile
             </h1>
-            
+
             <div className='flex items-center justify-center p-4'>
                 <div
                     className='
@@ -35,10 +59,10 @@ const Profile = () => {
                     {/* Image section */}
                     <div className='flex flex-col items-center gap-3 sm:gap-4 pb-4 sm:pb-6 border-b border-base-300'>
                         <div className='relative'>
-                            <img 
-                                src={profilePic} 
+                            <img
+                                src={profilePic}
                                 alt={fullName}
-                                className='size-24 sm:size-32 md:size-40 rounded-full object-cover ring-4 ring-primary/20' 
+                                className='size-24 sm:size-32 md:size-40 rounded-full object-cover ring-4 ring-primary/20'
                             />
                             <div className='absolute bottom-0 right-0 size-6 sm:size-8 bg-success rounded-full border-4 border-base-200'></div>
                         </div>
@@ -65,6 +89,24 @@ const Profile = () => {
                                 <p className='text-sm sm:text-base md:text-lg text-base-content'>
                                     {bio}
                                 </p>
+                            </div>
+                        )}
+
+                        {/* Native Language */}
+                        {nativeLanguage && (
+                            <div className='bg-base-300/50 rounded-xl p-3 sm:p-4 flex items-center gap-2 sm:gap-3'>
+                                <FaGlobe className='text-primary text-lg sm:text-xl shrink-0' />
+                                <div className='flex-1'>
+                                    <p className='text-xs sm:text-sm font-semibold text-base-content/70 uppercase tracking-wide'>
+                                        Native Language
+                                    </p>
+                                    <div className='flex items-center gap-2 mt-1'>
+                                        {getLanguageFlag(nativeLanguage)}
+                                        <p className='text-sm sm:text-base md:text-lg text-base-content'>
+                                            {nativeLanguage}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         )}
 
@@ -97,12 +139,21 @@ const Profile = () => {
                         </div>
                     </div>
 
-                    {/* Edit Profile Button - Optional */}
-                    <button className='btn btn-primary w-full mt-2'>
+                    {/* Edit Profile Button */}
+                    <button
+                        onClick={() => setIsEditModalOpen(!isEditModalOpen)}
+                        className='btn btn-primary w-full mt-2'>
                         Edit Profile
                     </button>
                 </div>
             </div>
+
+            {/* Edit Profile Modal */}
+            <EditProfileModal
+                isOpen={isEditModalOpen}
+                onClose={handleCloseModal}
+                userData={userData}
+            />
         </div>
     )
 }

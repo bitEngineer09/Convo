@@ -25,18 +25,18 @@ const App = () => {
 
     // console.log("Auth Status:", { isAuthenticated, isOnboarded, userData });
 
-    if (authLoading || userLoading) return <PageLoader />;
+    if (authLoading || userLoading) return <div className='absolute inset-0'><PageLoader /></div>;
 
     return (
         <div data-theme={theme} className='transition-colors duration-400'>
             <Routes>
                 <Route path="/auth" element={!isAuthenticated ? <Auth /> : <Navigate to="/" replace />} />
-                
-                <Route 
-                    path="/onboarding" 
+
+                <Route
+                    path="/onboarding"
                     element={
                         isAuthenticated && !isOnboarded ? <Onboarding /> : <Navigate to="/" replace />
-                    } 
+                    }
                 />
 
                 {isAuthenticated && isOnboarded ? (
@@ -51,8 +51,8 @@ const App = () => {
                 ) : (
                     <Route path="*" element={
                         <Navigate to={
-                            !isAuthenticated ? "/auth" : 
-                            !isOnboarded ? "/onboarding" : "/"
+                            !isAuthenticated ? "/auth" :
+                                !isOnboarded ? "/onboarding" : "/"
                         } replace />
                     } />
                 )}

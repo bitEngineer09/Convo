@@ -168,3 +168,16 @@ export const removeFriend = async (id) => {
     throw error;
   }
 }
+
+// update profile
+export const updateProfile = async (formData) => {
+  try {
+    const res = await axiosInstance.put("/auth/update-profile", formData);
+    console.log("Profile updated:", res.data);
+    return res.data;
+  } catch (error) {
+    console.error("Error in updateProfile:", error);
+    throw error;
+  }
+};
+

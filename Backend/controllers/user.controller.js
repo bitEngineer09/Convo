@@ -163,25 +163,21 @@ export const getAllFriendRequests = async (req, res) => {
 
     const userId = req.user.id;
 
-    // pending requests you received
     const incommingRequests = await FriendRequest.find({
       recipient: userId,
       status: "pending",
-    }).populate("sender", "fullName profilePic nativeLanguage");
+    }).populate("sender", "fullName profilePic nativeLanguage bio");
 
-    // accepted requests where you were the recipient
     const acceptedAsRecipient = await FriendRequest.find({
       recipient: userId,
       status: "accepted",
-    }).populate("sender", "fullName profilePic");
+    }).populate("sender", "fullName profilePic nativeLanguage bio");
 
-    // accepted requests where you were the sender
     const acceptedAsSender = await FriendRequest.find({
       sender: userId,
       status: "accepted",
-    }).populate("recipient", "fullName profilePic");
+    }).populate("recipient", "fullName profilePic nativeLanguage bio");
 
-    // merge both accepted arrays
     const acceptedRequests = [...acceptedAsRecipient, ...acceptedAsSender];
 
     return res.status(200).json({

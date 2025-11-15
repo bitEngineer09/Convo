@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { FaUserFriends, FaRegBell } from "react-icons/fa";
 import { IoChatboxOutline } from "react-icons/io5";
 import { MdOutlineWatchLater } from "react-icons/md";
@@ -10,9 +10,13 @@ import { useRejectRequest } from '../hooks/useRejectRequest';
 import NoFriendRequests from '../components/NoFriendRequests';
 import Loader from '../components/Loader';
 import NoNewNotifications from '../components/NoNewNotifications';
+import UserProfileModal from '../components/UserProfileModal';
 import { Link } from 'react-router-dom';
 
 const Notifications = () => {
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const { data: friendRequests, isLoading: loadingRequests } = useQuery({
     queryKey: ["friendRequests"],
     queryFn: getAllFriendRequests,
@@ -28,6 +32,16 @@ const Notifications = () => {
 
   const incommingRequests = friendRequests?.incommingRequests || [];
   const acceptedRequests = friendRequests?.acceptedRequests || [];
+
+  const handleUserClick = (user) => {
+    setSelectedUser(user);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedUser(null);
+  };
 
   if (incommingRequests.length === 0 && acceptedRequests.length === 0)
     return <NoNewNotifications />;
@@ -64,14 +78,17 @@ const Notifications = () => {
                         bg-base-200 hover:shadow-md transition-shadow 
                         mt-4 p-3 sm:p-4
                       '>
-                      <div className='flex items-center gap-3 sm:gap-5 w-full sm:w-auto'>
+                      <div 
+                        className='flex items-center gap-3 sm:gap-5 w-full sm:w-auto cursor-pointer'
+                        onClick={() => handleUserClick(requestedUser?.sender)}
+                      >
                         <img
                           src={requestedUser?.sender?.profilePic}
                           alt=""
-                          className='size-14 sm:size-16 md:size-18 rounded-full shrink-0'
+                          className='size-14 sm:size-16 md:size-18 rounded-full shrink-0 hover:ring-2 hover:ring-primary transition-all'
                         />
                         <div className='flex flex-col gap-1 sm:gap-2 min-w-0'>
-                          <span className='text-sm sm:text-base font-medium truncate'>
+                          <span className='text-sm sm:text-base font-medium truncate hover:text-primary transition-colors'>
                             {requestedUser?.sender?.fullName}
                           </span>
                           <p
@@ -139,14 +156,17 @@ const Notifications = () => {
                       bg-base-200 hover:shadow-md transition-shadow 
                       mt-4 p-3 sm:p-4
                     '>
-                    <div className='flex items-center gap-3 sm:gap-5 w-full sm:w-auto'>
+                    <div 
+                      className='flex items-center gap-3 sm:gap-5 w-full sm:w-auto cursor-pointer'
+                      onClick={() => handleUserClick(user)}
+                    >
                       <img
                         src={user?.profilePic}
                         alt=""
-                        className='size-14 sm:size-16 md:size-18 rounded-full shrink-0'
+                        className='size-14 sm:size-16 md:size-18 rounded-full shrink-0 hover:ring-2 hover:ring-primary transition-all'
                       />
                       <div className='flex flex-col gap-1 sm:gap-2 min-w-0 flex-1'>
-                        <span className='text-sm sm:text-base font-medium truncate'>
+                        <span className='text-sm sm:text-base font-medium truncate hover:text-primary transition-colors'>
                           {user?.fullName}
                         </span>
                         <div className='flex flex-col gap-1'>
@@ -178,6 +198,13 @@ const Notifications = () => {
           }
         </div>
       }
+
+      {/* User Profile Modal */}
+      <UserProfileModal 
+        user={selectedUser}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+      />
     </div>
   );
 }
