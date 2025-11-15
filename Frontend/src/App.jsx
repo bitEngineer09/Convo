@@ -45,7 +45,7 @@ const App = () => {
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/chat/:id" element={<ChatPage />} />
                         <Route path="/notifications" element={<Notifications />} />
-                        <Route path="/call/:id" element={<CallPage />} />
+                        <Route path="/call/:callId" element={<CallPage />} />
                         <Route path="/friends" element={<Friends />} />
                     </Route>
                 ) : (
