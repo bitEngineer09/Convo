@@ -5,9 +5,9 @@ import {
     loginController,
     logoutController,
     onboardingController,
-    signupController
+    signupController,
+    updateProfileController
 } from '../controllers/auth.controller.js';
-import { updateProfileController } from '../controllers/user.controller.js';
 
 const authRouter = express.Router();
 
