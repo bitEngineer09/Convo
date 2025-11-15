@@ -5,7 +5,7 @@ const NoRecommendation = () => {
         <div
             className='
                 flex flex-col items-center justify-center 
-                h-full 
+                min-h-40
                 bg-base-200 rounded-xl
                 border border-primary-content
                 text-base-content

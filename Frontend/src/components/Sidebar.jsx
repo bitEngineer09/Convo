@@ -15,12 +15,21 @@ const Sidebar = () => {
     const { logoutMutation } = useLogout();
     const navigate = useNavigate();
 
+    const handleLogout = async () => {
+        try {
+            await logoutMutation();
+            navigate("/auth");
+        } catch (error) {
+            console.error("Error in handleLogout: ", error);
+        }
+    }
+
     const navLinks = [
         { link: "Home", path: "/", icon: <IoHomeOutline /> },
         { link: "Friends", path: "/friends", icon: <FaUserFriends /> },
         { link: "Notifications", path: "/notifications", icon: <IoNotificationsOutline /> },
         { link: "Theme", onClick: () => setThemePopup(true), icon: <LuPalette /> },
-        { link: "Logout", onClick: () => logoutMutation(navigate), icon: <IoExitOutline /> },
+        { link: "Logout", onClick: handleLogout, icon: <IoExitOutline /> },
     ];
 
 
