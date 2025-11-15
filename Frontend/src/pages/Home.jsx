@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 import Loader from '../components/Loader';
 import NoFriends from '../components/NoFriends';
 import NoRecommendation from '../components/NoRecommendation';
+import PageLoader from '../components/PageLoader';
 
 const Home = () => {
   const queryClient = useQueryClient();
@@ -71,11 +72,26 @@ const Home = () => {
     sendRequestMutation(userId);
   }
 
+  // Agar dono loading hai toh full page loader dikhao
+  if (loadingFriends || loadingRecommendedUsers) {
+    return (
+      <div className='absolute inset-0'>
+        <PageLoader />
+      </div>
+    );
+  }
+
   return (
     <div className='flex flex-col px-3 sm:px-4 md:px-6 py-4'>
       {/* Friends */}
-      <section className='min-h-60 mb-6 sm:mb-8 md:mb-10'>
-        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 '>
+      <section className='min-h-60 mb-6 sm:mb-8 '>
+        <div
+          className='
+            flex flex-col sm:flex-row
+            justify-between items-start sm:items-center
+            gap-3 sm:gap-0
+            mb-2
+            '>
           <p className='text-2xl sm:text-3xl md:text-4xl font-medium'>Your Friends</p>
           <Link 
             to="/notifications" 
@@ -86,11 +102,10 @@ const Home = () => {
           </Link>
         </div>
 
-        {loadingFriends ? <Loader /> :
-          friends.length == 0 ? <NoFriends /> :
-            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4'>
-              {friends?.map((friend) => <FriendsCard key={friend?._id} friend={friend} />)}
-            </div>
+        {friends.length === 0 ? <NoFriends /> :
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4'>
+            {friends?.map((friend) => <FriendsCard key={friend?._id} friend={friend} />)}
+          </div>
         }
       </section>
 
@@ -99,19 +114,18 @@ const Home = () => {
         <div className='mb-4 sm:mb-5'>
           <p className='text-2xl sm:text-3xl md:text-4xl font-medium'>Meet New Learners</p>
         </div>
-        {loadingRecommendedUsers ? <Loader /> :
-          recommendedUsers?.length == 0 ? <NoRecommendation /> :
-            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4'>
-              {recommendedUsers.map((user) =>
-                <RecommendedUsers
-                  key={user?._id}
-                  user={user}
-                  onSendRequest={() => handleSendRequest(user?._id)}
-                  isRequestSent={hasOutgoingRequest(user?._id)}
-                />
-              )
-              }
-            </div>
+        {recommendedUsers?.length === 0 ? <NoRecommendation /> :
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4'>
+            {recommendedUsers.map((user) =>
+              <RecommendedUsers
+                key={user?._id}
+                user={user}
+                onSendRequest={() => handleSendRequest(user?._id)}
+                isRequestSent={hasOutgoingRequest(user?._id)}
+              />
+            )
+            }
+          </div>
         }
       </section>
     </div>

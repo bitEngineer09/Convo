@@ -6,6 +6,7 @@ import FriendProfileView from '../components/FriendProfileView';
 import Loader from '../components/Loader';
 import NoFriends from '../components/NoFriends';
 import { FaUserFriends } from "react-icons/fa";
+import { useRemoveFriend } from '../hooks/useRemoveFriend';
 
 const Friends = () => {
   const [selectedFriend, setSelectedFriend] = useState(null);
@@ -14,6 +15,12 @@ const Friends = () => {
     queryKey: ["friends"],
     queryFn: getFriends,
   });
+
+  const { removeFriendMutation } = useRemoveFriend();
+
+  const handleRemoveFriend = async (friendId) => {
+    removeFriendMutation(friendId);
+  }
 
   return (
     <div className='h-full flex flex-col px-3 sm:px-4 md:px-6 py-4'>
@@ -34,7 +41,7 @@ const Friends = () => {
           <div className='p-3 sm:p-4 border-b border-base-300'>
             <h2 className='text-lg sm:text-xl font-semibold'>All Friends ({friends.length})</h2>
           </div>
-          
+
           <div className='flex-1 overflow-y-auto p-2 sm:p-3'>
             {loadingFriends ? (
               <div className='flex items-center justify-center h-full'>
@@ -50,6 +57,7 @@ const Friends = () => {
                     friend={friend}
                     isSelected={selectedFriend?._id === friend._id}
                     onClick={() => setSelectedFriend(friend)}
+                    onRemove={handleRemoveFriend}
                   />
                 ))}
               </div>

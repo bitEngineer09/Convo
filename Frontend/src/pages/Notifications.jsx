@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getAllFriendRequests, getAuthUser } from '../lib/api';
 import { LANGUAGE_TO_FLAG } from '../constants/constants';
 import { useAcceptRequests } from '../hooks/useAcceptRequests';
+import { useRejectRequest } from '../hooks/useRejectRequest'; 
 import NoFriendRequests from '../components/NoFriendRequests';
 import Loader from '../components/Loader';
 import NoNewNotifications from '../components/NoNewNotifications';
@@ -22,7 +23,8 @@ const Notifications = () => {
     queryFn: getAuthUser,
   });
 
-  const { isPending, error, accpetRequestMutation } = useAcceptRequests();
+  const { isPending: acceptPending, accpetRequestMutation } = useAcceptRequests();
+  const { isPending: rejectPending, rejectRequestMutation } = useRejectRequest();
 
   const incommingRequests = friendRequests?.incommingRequests || [];
   const acceptedRequests = friendRequests?.acceptedRequests || [];
@@ -91,11 +93,15 @@ const Notifications = () => {
                       <div className='flex gap-2 sm:gap-3 w-full sm:w-auto'>
                         <button
                           onClick={() => accpetRequestMutation(requestedUser?._id)}
+                          disabled={acceptPending || rejectPending}
                           className='btn btn-soft btn-success btn-sm sm:btn-md flex-1 sm:flex-none'>
-                          Accept
+                          {acceptPending ? <Loader size="small" /> : "Accept"}
                         </button>
-                        <button className='btn btn-soft btn-error btn-sm sm:btn-md flex-1 sm:flex-none'>
-                          Reject
+                        <button 
+                          onClick={() => rejectRequestMutation(requestedUser?._id)}
+                          disabled={acceptPending || rejectPending}
+                          className='btn btn-soft btn-error btn-sm sm:btn-md flex-1 sm:flex-none'>
+                          {rejectPending ? <Loader size="small" /> : "Reject"}
                         </button>
                       </div>
                     </div>
@@ -108,7 +114,7 @@ const Notifications = () => {
       </div>
 
       {/* New Connections */}
-      <p className='flex items-center gap-2 mt-6 sm:mt-8 font-medium text-base sm:text-lg'>
+      <p className='flex items-center gap-2 font-medium text-base sm:text-lg mt-6'>
         <FaRegBell className='text-primary text-lg sm:text-xl' /> New Connections
       </p>
 
@@ -118,7 +124,6 @@ const Notifications = () => {
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-5'>
           {
             acceptedRequests?.map((notification) => {
-              // Determine who the "other user" is
               const user =
                 notification?.sender?._id === authUser?._id
                   ? notification?.recipient
@@ -157,7 +162,7 @@ const Notifications = () => {
                     </div>
 
                     <Link
-                      to={`/chat/${notification?.sender?._id}`}
+                      to={`/chat/${user?._id}`}
                       className='
                         flex gap-2 items-center 
                         badge badge-success 
@@ -177,10 +182,7 @@ const Notifications = () => {
   );
 }
 
-export default Notifications;
 
-
-// helper
 function getLanguageFlag(language) {
   if (!language) return null;
 
@@ -198,3 +200,5 @@ function getLanguageFlag(language) {
   }
   return null;
 }
+
+export default Notifications;

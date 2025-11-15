@@ -25,7 +25,7 @@ const Onboarding = () => {
         profilePic: userData?.profilePic || "",
         fullName: userData?.fullName || "",
         bio: userData?.bio || "",
-        nativeLanguage: userData?.nativeLanguage || "",
+        nativeLanguage: userData?.nativeLanguage || "English",
         location: userData?.location || ""
     });
 

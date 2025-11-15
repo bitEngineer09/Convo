@@ -144,3 +144,27 @@ export const getStreamToken = async () => {
     throw error;
   }
 }
+
+// reject friend request
+export const rejectFriendRequest = async (requestId) => {
+  try {
+    const res = await axiosInstance.delete(`/user/reject-request/${requestId}`);
+    console.log(res.data);
+    return res.data;
+  } catch (error) {
+    console.error('Error rejecting friend request:', error);
+    throw error;
+  }
+}
+
+// remove friend
+export const removeFriend = async (id) => {
+  try {
+    const res = await axiosInstance.delete(`/user/remove-friend/${id}`)
+    console.log(res.data);
+    return res.data;
+  } catch (error) {
+    console.log("Error in remove friend: ", removeFriend);
+    throw error;
+  }
+}

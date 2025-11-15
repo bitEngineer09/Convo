@@ -5,6 +5,8 @@ import {
     getAllOutgoingFriendRequests,
     getMyFriends,
     getRecommendedUsers,
+    rejectFriendRequest,
+    removeFriend,
     sendFriendRequest
 } from '../controllers/user.controller.js';
 import { isAuth } from '../middlewares/isAuth.js';
@@ -19,5 +21,8 @@ userRouter.put("/friend-request/:id/accept", isAuth, accpetFriendRequest);
 userRouter.get("/friend-requests", isAuth, getAllFriendRequests);
 
 userRouter.get("/outgoing-requests", isAuth, getAllOutgoingFriendRequests);
+
+userRouter.delete("/remove-friend/:id", isAuth, removeFriend);
+userRouter.delete("/reject-request/:id", isAuth, rejectFriendRequest);
 
 export default userRouter;

@@ -7,11 +7,13 @@ import { LuPalette } from "react-icons/lu";
 import { IoExitOutline } from "react-icons/io5";
 import { useLogout } from '../hooks/useLogout';
 import ThemeSelector from './ThemeSelector';
+import LogoutCofirm from './LogoutCofirm';
 
 const Sidebar = () => {
 
     const { userData } = useUserData();
     const [themePopup, setThemePopup] = useState(false);
+    const [logoutConfirm, setLogoutConfirm] = useState(false);
     const { logoutMutation } = useLogout();
     const navigate = useNavigate();
 
@@ -29,7 +31,7 @@ const Sidebar = () => {
         { link: "Friends", path: "/friends", icon: <FaUserFriends /> },
         { link: "Notifications", path: "/notifications", icon: <IoNotificationsOutline /> },
         { link: "Theme", onClick: () => setThemePopup(true), icon: <LuPalette /> },
-        { link: "Logout", onClick: handleLogout, icon: <IoExitOutline /> },
+        { link: "Logout", onClick: () => setLogoutConfirm(true), icon: <IoExitOutline /> },
     ];
 
 
@@ -95,9 +97,9 @@ const Sidebar = () => {
 
             {/* Bottom Profile Section */}
             <div className="flex items-center gap-2 p-2 lg:p-3 border-t border-base-300 mt-auto rounded-xl">
-                <img 
-                    src={userData?.profilePic} 
-                    className="size-10 rounded-full object-cover" 
+                <img
+                    src={userData?.profilePic}
+                    className="size-10 rounded-full object-cover"
                     alt="Profile"
                 />
                 <div className="hidden lg:block">
@@ -111,6 +113,15 @@ const Sidebar = () => {
 
             {/* Theme Selector Modal */}
             {themePopup && <ThemeSelector onClose={() => setThemePopup(false)} />}
+
+            {/* Logout Confirmation Modal */}
+            {logoutConfirm && (
+                <LogoutCofirm 
+                    setLogoutConfirm={setLogoutConfirm} 
+                    handleLogout={handleLogout}
+                    navigate={navigate}
+                />
+            )}
         </aside>
     );
 };
