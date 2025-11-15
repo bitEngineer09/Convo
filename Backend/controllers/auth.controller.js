@@ -273,7 +273,7 @@ export const updateProfileController = async (req, res) => {
         });
 
         const userId = req.user.id;
-        const { fullName, bio, location } = req.body;
+        const { fullName, bio, location, nativeLanguage } = req.body;
 
         if (!fullName && !bio && !profilePic) {
             return res.status(400).json({
@@ -284,7 +284,7 @@ export const updateProfileController = async (req, res) => {
 
         const updatedUser = await User.findByIdAndUpdate(
             userId,
-            { fullName, bio, location },
+            { fullName, bio, location, nativeLanguage },
             { new: true }
         );
 
